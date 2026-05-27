@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Agenda Digital</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>Agenda Digital</h1>
+
+    <div class="formulario">
+
+      <input type="text" id="nome" placeholder="Nome">
+
+      <input type="text" id="telefone" placeholder="Telefone">
+
+      <input type="email" id="email" placeholder="E-mail">
+
+      <div class="botoes">
+
+        <button onclick="salvarContato()">
+          Salvar
+        </button>
+
+        <button onclick="limparFormulario()">
+          Cancelar
+        </button>
+
+      </div>
+
+    </div>
+
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>Nome</th>
+          <th>Telefone</th>
+          <th>Email</th>
+          <th>Ações</th>
+        </tr>
+
+      </thead>
+
+      <tbody id="listaContatos"></tbody>
+
+    </table>
+
+  </div>
+
+  <script src="app.js"></script>
+
+</body>
+</html>
