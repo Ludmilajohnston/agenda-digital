@@ -1,5 +1,6 @@
 const SUPABASE_URL = "https://kkbnekygfwizviapvcfo.supabase.co";
-const SUPABASE_KEY = "sb_publishable_3Fi7MWfPTdKXOVAF_AxkGw_1QT4xTKm";
+
+const SUPABASE_KEY = "SUA_CHAVE_PUBLICAVEL";
 
 const client = supabase.createClient(
   SUPABASE_URL,
@@ -10,10 +11,16 @@ let contatoEditando = null;
 
 async function listarContatos(){
 
-  const { data } = await client
+  const { data, error } = await client
     .from("contato")
     .select("*")
     .order("id", { ascending: true });
+
+  if(error){
+    console.log(error);
+    alert("Erro ao carregar contatos");
+    return;
+  }
 
   const lista = document.getElementById("listaContatos");
 
@@ -25,12 +32,19 @@ async function listarContatos(){
       <tr>
 
         <td>${contato.nome}</td>
+
         <td>${contato.telefone}</td>
+
         <td>${contato.email}</td>
 
         <td>
 
-          <button onclick="editarContato(${contato.id}, '${contato.nome}', '${contato.telefone}', '${contato.email}')">
+          <button onclick="editarContato(
+            ${contato.id},
+            '${contato.nome}',
+            '${contato.telefone}',
+            '${contato.email}'
+          )">
             ✏
           </button>
 
@@ -47,13 +61,33 @@ async function listarContatos(){
 
 async function salvarContato(){
 
-  const nome = document.getElementById("nome").value;
-  const telefone = document.getElementById("telefone").value;
-  const email = document.getElementById("email").value;
+  const nome = document
+    .getElementById("nome")
+    .value
+    .trim();
+
+  const telefone = document
+    .getElementById("telefone")
+    .value
+    .trim();
+
+  const email = document
+    .getElementById("email")
+    .value
+    .trim();
+
+  if(nome === "" || telefone === "" || email === ""){
+
+    alert("Preencha todos os campos");
+
+    return;
+  }
+
+  let error = null;
 
   if(contatoEditando){
 
-    await client
+    const response = await client
       .from("contato")
       .update({
         nome,
@@ -62,9 +96,11 @@ async function salvarContato(){
       })
       .eq("id", contatoEditando);
 
+    error = response.error;
+
   }else{
 
-    await client
+    const response = await client
       .from("contato")
       .insert([
         {
@@ -73,6 +109,17 @@ async function salvarContato(){
           email
         }
       ]);
+
+    error = response.error;
+  }
+
+  if(error){
+
+    console.log(error);
+
+    alert("Erro ao salvar contato");
+
+    return;
   }
 
   limparFormulario();
@@ -85,23 +132,42 @@ function editarContato(id, nome, telefone, email){
   contatoEditando = id;
 
   document.getElementById("nome").value = nome;
+
   document.getElementById("telefone").value = telefone;
+
   document.getElementById("email").value = email;
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 }
 
 async function excluirContato(id){
 
-  const confirmar = confirm("Deseja excluir?");
+  const confirmar = confirm(
+    "Deseja realmente excluir este contato?"
+  );
 
-  if(confirmar){
-
-    await client
-      .from("contato")
-      .delete()
-      .eq("id", id);
-
-    listarContatos();
+  if(!confirmar){
+    return;
   }
+
+  const { error } = await client
+    .from("contato")
+    .delete()
+    .eq("id", id);
+
+  if(error){
+
+    console.log(error);
+
+    alert("Erro ao excluir contato");
+
+    return;
+  }
+
+  listarContatos();
 }
 
 function limparFormulario(){
@@ -109,7 +175,9 @@ function limparFormulario(){
   contatoEditando = null;
 
   document.getElementById("nome").value = "";
+
   document.getElementById("telefone").value = "";
+
   document.getElementById("email").value = "";
 }
 
